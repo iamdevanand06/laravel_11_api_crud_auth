@@ -59,4 +59,15 @@ class RegisterController extends Controller
             return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
         }
     }
+
+    public function logout(Request $request)
+    {
+        if (isset($request->user()->id)){
+            $request->user()->token()->revoke();
+            $success = [];
+            return $this->sendResponse($success, 'User log-out successfully.');
+        }else{
+            return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
+        }
+    }
 }

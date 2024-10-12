@@ -7,12 +7,13 @@ use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\ProductController;
 
 
-// Route::post('register', [RegisterController::class, 'register']);
-// Route::post('login', [RegisterController::class, 'login']);
-Route::resource('products', ProductController::class);
+Route::post('register', [RegisterController::class, 'register']);
+Route::post('login', [RegisterController::class, 'login']);
+// Route::resource('products', ProductController::class);
 
 Route::middleware('auth:api')->group( function () {
-    // Route::resource('products', ProductController::class);
+    Route::resource('products', ProductController::class);
+    Route::post('logout', [RegisterController::class, 'logout']);
 });
 
 // Route::get('/user', function (Request $request) {
