@@ -23,9 +23,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // $this->registerPolicies();
-
         // Passport::routes();
-        Passport::personalAccessTokensExpireIn(Carbon::now()->addMinute(5));
+        // Token Expire Start
+        Passport::personalAccessTokensExpireIn(Carbon::now()->addMinute(15));
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(30));
+        // Token Expire End
     }
 }
