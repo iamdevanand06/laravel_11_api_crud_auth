@@ -18,7 +18,6 @@ class ResetPasswordController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'password' => 'required|min:6|string',
-            'code' => 'required|min:6|numeric',
             'email' => 'required|email|exists:users',
         ]);
 
@@ -29,8 +28,8 @@ class ResetPasswordController extends Controller
             $forgetPassword = ResetCodePassword::firstWhere('email', $request->email);
 
 
-            if (isset($forgetPassword) && ($forgetPassword->created_at > now()->addMinute(10) && (strcmp($forgetPassword->code, $request->code) !== 0)) ) {
-                return $this->sendError(['user_condition' => 'rejected', 'code' => $request->code], trans('Please enter the valid code'), 422);
+            if (isset($forgetPassword)) {
+                return $this->sendError(['user_condition' => 'rejected'], trans('Passcode meta not retrieved'), 422);
             }
 
 
