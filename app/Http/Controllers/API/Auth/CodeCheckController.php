@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\ResetCodePassword;
+use App\Models\User;
 use App\Traits\commonTrait;
 use Illuminate\Http\Request;
 use Validator;
@@ -31,7 +32,7 @@ class CodeCheckController extends Controller
             return $this->sendError('Validation Error.', $validator->errors(), 422);
         }
 
-        $passwordReset = ResetCodePassword::firstWhere('email', $request->email);
+        $passwordReset = ResetCodePassword::where('email', $request->email)->where('code_type', $request->code_type)->first();
 
         if (isset($passwordReset)) {
             if ($passwordReset->verified == 1) {
@@ -49,9 +50,13 @@ class CodeCheckController extends Controller
             return $this->sendError(['Passcode meta not retrieved'], ['user_condition' => 'rejected'], 422);
         }
 
-        ResetCodePassword::where('email', $request->email)->update(['verified' => '1']);
-
-        return $this->sendResponse(['user_condition' => 'approved'], trans('passwords.code_is_valid'));
-
+        if ($request->code_type == 'pv'){
+            ResetCodePassword::where('email', $request->email)->update(['verified' => '1']);
+            return $this->sendResponse(['user_condition' => 'approved'], trans('Your passcode is verified'));
+        }elseif($request->code_type == 'ev'){
+            User::where('email', $request->email)->update(['email_verified_at' => now()]);
+            ResetCodePassword::where('email', $request->email)->delete();
+            return $this->sendResponse(['user_condition' => 'approved'], trans('Your Email is Verified'));
+        }
     }
 }

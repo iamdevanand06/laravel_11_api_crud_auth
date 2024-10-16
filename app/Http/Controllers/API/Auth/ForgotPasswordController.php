@@ -67,10 +67,14 @@ class ForgotPasswordController extends Controller
             ]
         ];
 
+        $data['sent_recipt'] = '0';
+
         if (env('APP_ENV') !== 'local') {
 
             // Send email to user
             Mail::to($data['email'])->send(new SendCodeResetPassword($emailContent));
+
+            $data['sent_recipt'] = '1';
 
             return $this->sendResponse(['userEmail' => $data['email'], 'message' => $message], 200);
         } else {
