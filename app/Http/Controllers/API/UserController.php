@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
-use Validator;
 use App\Http\Resources\UserResource;
-use Illuminate\Http\JsonResponse;
+use App\Models\User;
 use App\Traits\commonTrait;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Validator;
 
 class UserController extends Controller
 {
     use commonTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -20,15 +21,14 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        $user = User::all();
+        $user = User::paginate(10);
 
-        return $this->sendResponse(UserResource::collection($user), 'User retrieved successfully.');
+        return $this->sendResponse(UserResource::collection($user)->response()->getData(), 'User retrieved successfully.');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request): JsonResponse
@@ -39,10 +39,10 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required',
             'password' => 'required',
-            'c_password' => 'required'
+            'c_password' => 'required',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
@@ -71,7 +71,6 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -83,16 +82,16 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required',
             'password' => 'required',
-            'c_password' => 'required'
+            'c_password' => 'required',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
         $user->name = $input['name'];
         $user->email = $input['email'];
-        if ($input['password'] == $input['c_password']){
+        if ($input['password'] == $input['c_password']) {
             $user->password = $input['password'];
         }
         $user->save();

@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Product;
-use Validator;
 use App\Http\Resources\ProductResource;
-use Illuminate\Http\JsonResponse;
+use App\Models\Product;
 use App\Traits\commonTrait;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Validator;
 
 class ProductController extends Controller
 {
     use commonTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -20,15 +21,14 @@ class ProductController extends Controller
      */
     public function index(): JsonResponse
     {
-        $products = Product::all();
+        $products = Product::paginate(10);
 
-        return $this->sendResponse(ProductResource::collection($products), 'Products retrieved successfully.');
+        return $this->sendResponse(ProductResource::collection($products)->response()->getData(), 'Products retrieved successfully.');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request): JsonResponse
@@ -37,10 +37,10 @@ class ProductController extends Controller
 
         $validator = Validator::make($input, [
             'name' => 'required',
-            'detail' => 'required'
+            'detail' => 'required',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
@@ -69,7 +69,6 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -79,10 +78,10 @@ class ProductController extends Controller
 
         $validator = Validator::make($input, [
             'name' => 'required',
-            'detail' => 'required'
+            'detail' => 'required',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
