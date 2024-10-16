@@ -2,10 +2,9 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
-use Carbon\Carbon;
-
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,8 +24,13 @@ class AppServiceProvider extends ServiceProvider
         // $this->registerPolicies();
         // Passport::routes();
         // Token Expire Start
-        Passport::personalAccessTokensExpireIn(Carbon::now()->addMinute(15));
-        Passport::refreshTokensExpireIn(Carbon::now()->addDays(30));
+        if (env('APP_ENV') != 'local') {
+            Passport::personalAccessTokensExpireIn(Carbon::now()->addMinute(15));
+            Passport::refreshTokensExpireIn(Carbon::now()->addDays(30));
+        } else {
+            Passport::personalAccessTokensExpireIn(Carbon::now()->addHour());
+            Passport::refreshTokensExpireIn(Carbon::now()->addDays(30));
+        }
         // Token Expire End
     }
 }

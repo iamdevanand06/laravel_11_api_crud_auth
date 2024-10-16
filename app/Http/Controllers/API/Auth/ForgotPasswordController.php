@@ -8,18 +8,22 @@ use App\Models\ResetCodePassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Validator;
+use App\Traits\commonTrait;
 
 class ForgotPasswordController extends Controller
 {
+    use commonTrait;
+
     public function __invoke(Request $request)
     {
+
         $input = $request->all();
         $validator = Validator::make($input, [
             'email' => 'required|email|exists:users',
         ]);
 
         if ($validator->fails()) {
-            return response(['message' => 'Please enter the valid Email'], 422);
+            return $this->sendError('Validation Error.', $validator->errors(), 422);
         }
 
         $data['email'] = $request->email;
@@ -37,9 +41,9 @@ class ForgotPasswordController extends Controller
             // Send email to user
             Mail::to($data['email'])->send(new SendCodeResetPassword($codeData->code));
 
-            return response(['userEmail' => $data['email'], 'message' => 'We have emailed your password reset passcode'], 200);
+            return $this->sendResponse(['userEmail' => $data['email'], 'message' => 'We have emailed your password reset passcode'], 200);
         } else {
-            return response(['userEmail' => $data['email'], 'passcode' => $data['code'], 'message' => 'We have emailed your password reset passcode'], 200);
+            return $this->sendResponse(['userEmail' => $data['email'], 'passcode' => $data['code'], 'message' => 'We have emailed your password reset passcode'], 200);
         }
     }
 }

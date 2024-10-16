@@ -36,12 +36,12 @@ class ProductController extends Controller
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'name' => 'required',
-            'detail' => 'required',
+            'name' => 'required|unique:products|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
+            'detail' => 'required|max:150|regex:/^[a-zA-Z()]+$/u',
         ]);
 
         if ($validator->fails()) {
-            return $this->sendError('Validation Error.', $validator->errors());
+            return $this->sendError('Validation Error.', $validator->errors(), 422);
         }
 
         $product = Product::create($input);
@@ -77,8 +77,8 @@ class ProductController extends Controller
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'name' => 'required',
-            'detail' => 'required',
+            'name' => 'required|unique:products|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
+            'detail' => 'required|max:150|regex:/^[a-zA-Z()]+$/u',
         ]);
 
         if ($validator->fails()) {

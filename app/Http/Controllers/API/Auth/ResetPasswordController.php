@@ -22,7 +22,7 @@ class ResetPasswordController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response(['message' => 'Please enter the password'], 422);
+            return $this->sendError('Validation Error.', $validator->errors(), 422);
         }
 
         $forgetPassword = ResetCodePassword::firstWhere('email', $request->email);

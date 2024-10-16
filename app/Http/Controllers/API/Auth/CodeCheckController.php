@@ -27,8 +27,9 @@ class CodeCheckController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response(['message' => 'Please enter the valid otp'], 422);
+            return $this->sendError('Validation Error.', $validator->errors(), 422);
         }
+
         $passwordReset = ResetCodePassword::firstWhere('email', $request->email);
 
         if (isset($passwordReset)) {

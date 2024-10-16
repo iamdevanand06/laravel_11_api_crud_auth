@@ -36,10 +36,10 @@ class UserController extends Controller
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            'c_password' => 'required',
+            'name' => 'required|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
+            'email' => 'required|email|unique:users',
+            'password' => 'required_with:c_password|min:6|alpha_num|same:c_password',
+            'c_password' => 'min:6|alpha_num',
         ]);
 
         if ($validator->fails()) {
@@ -79,10 +79,10 @@ class UserController extends Controller
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            'c_password' => 'required',
+            'name' => 'required|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
+            'email' => 'required|email|unique:users',
+            'password' => 'required_with:c_password|min:6|alpha_num|same:c_password',
+            'c_password' => 'min:6|alpha_num',
         ]);
 
         if ($validator->fails()) {
@@ -91,9 +91,7 @@ class UserController extends Controller
 
         $user->name = $input['name'];
         $user->email = $input['email'];
-        if ($input['password'] == $input['c_password']) {
-            $user->password = $input['password'];
-        }
+
         $user->save();
 
         return $this->sendResponse(new UserResource($user), 'User updated successfully.');
