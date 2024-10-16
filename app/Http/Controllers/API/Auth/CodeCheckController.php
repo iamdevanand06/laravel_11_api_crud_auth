@@ -24,6 +24,7 @@ class CodeCheckController extends Controller
         $validator = Validator::make($input, [
             'email' => 'required|email|exists:users',
             'code' => 'required|min:6|numeric',
+            'code_type' => 'required|string|max:2'
         ]);
 
         if ($validator->fails()) {

@@ -13,6 +13,7 @@ class ResetCodePassword extends Model
         'id',
         'email',
         'code',
+        'code_type',
         'created_at',
     ];
 }

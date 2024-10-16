@@ -13,25 +13,25 @@ class SendCodeResetPassword extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $code;
+    public $email;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($code)
+    public function __construct($email)
     {
-        $this->code = $code;
+        $this->email = $email;
     }
 
     /**
      * Get the message envelope.
      */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Send Code Reset Password',
-        );
-    }
+    // public function envelope(): Envelope
+    // {
+    //     return new Envelope(
+    //         subject: $this->$email['subject'],
+    //     );
+    // }
 
     /**
      * Get the message content definition.
@@ -55,6 +55,6 @@ class SendCodeResetPassword extends Mailable
 
     public function build()
     {
-        return $this->markdown('emails.send-code-reset-password');
+        return $this->markdown('emails.send-code-password')->subject($this->email['subject'])->with('email', $this->email);
     }
 }

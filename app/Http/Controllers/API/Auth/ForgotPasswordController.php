@@ -20,6 +20,7 @@ class ForgotPasswordController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'email' => 'required|email|exists:users',
+            'code_type' => 'required|string|max:2'
         ]);
 
         if ($validator->fails()) {
@@ -34,16 +35,46 @@ class ForgotPasswordController extends Controller
         // Generate random code
         $data['code'] = mt_rand(100000, 999999);
 
+        //send code type
+        $data['code_type'] = $request->code_type;
+
         // Create a new code
         $codeData = ResetCodePassword::create($data);
 
-        if (env('APP_ENV') !== 'local') {
-            // Send email to user
-            Mail::to($data['email'])->send(new SendCodeResetPassword($codeData->code));
+        if ($request->code_type == 'pv') { //Password Reset
 
-            return $this->sendResponse(['userEmail' => $data['email'], 'message' => 'We have emailed your password reset passcode'], 200);
+            $message = 'We have emailed your password reset passcode';
+            $subject = 'Send Code Reset Password';
+            $line_1 = 'We have received your request to reset your account password';
+            $line_2 = 'You can use the following code to recover your account:';
+
+        } elseif($request->code_type == 'ev'){ //Email verification
+
+            $message = 'We have emailed your email verification passcode';
+            $subject = 'Send Code Verification Email';
+            $line_1 = 'We have received your request to email verification account';
+            $line_2 = 'You can use the following code to verify your account:';
+
+        }
+
+        $emailContent = [
+            'subject' => $subject,
+            'body' => [
+                'line_1' => $line_1,
+                'line_2' => $line_2,
+                'code' => $codeData->code,
+                'line_3' => 'The allowed duration of the code is 10 minutes from the time the message was sent!'
+            ]
+        ];
+
+        if (env('APP_ENV') !== 'local') {
+
+            // Send email to user
+            Mail::to($data['email'])->send(new SendCodeResetPassword($emailContent));
+
+            return $this->sendResponse(['userEmail' => $data['email'], 'message' => $message], 200);
         } else {
-            return $this->sendResponse(['userEmail' => $data['email'], 'passcode' => $data['code'], 'message' => 'We have emailed your password reset passcode'], 200);
+            return $this->sendResponse(['userEmail' => $data['email'], 'content' => $emailContent, 'message' => $message], 200);
         }
     }
 }
