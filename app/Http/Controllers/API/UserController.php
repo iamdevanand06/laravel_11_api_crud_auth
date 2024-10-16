@@ -37,6 +37,7 @@ class UserController extends Controller
 
         $validator = Validator::make($input, [
             'name' => 'required|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
+            // 'mobile_number' => 'required|min:10|max:10|regex:/^[6-9]{1}[0-9]{9}+$',
             'email' => 'required|email|unique:users',
             'password' => 'required_with:c_password|min:6|alpha_num|same:c_password',
             'c_password' => 'min:6|alpha_num',
@@ -81,6 +82,7 @@ class UserController extends Controller
         $validator = Validator::make($input, [
             'name' => 'required|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
             'email' => 'required|email|unique:users',
+            // 'mobile_number' => 'required|min:10|max:10|regex:/^[6-9]{1}[0-9]{9}+$',
             'password' => 'required_with:c_password|min:6|alpha_num|same:c_password',
             'c_password' => 'min:6|alpha_num',
         ]);

@@ -38,6 +38,10 @@ class ProductController extends Controller
         $validator = Validator::make($input, [
             'name' => 'required|unique:products|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
             'detail' => 'required|max:150|regex:/^[a-zA-Z0-9() ]+$/u',
+            'capasity_type' => 'required|max:3|alpha',
+            'capasity' => 'required|max:4|numeric',
+            'unit' => 'required|max:5|numeric',
+            'price_per_unit' => 'required|max:5|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -79,6 +83,10 @@ class ProductController extends Controller
         $validator = Validator::make($input, [
             'name' => 'required|unique:products|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
             'detail' => 'required|max:150|regex:/^[a-zA-Z0-9() ]+$/u',
+            'capasity_type' => 'required|max:3|alpha',
+            'capasity' => 'required|max:4|numeric',
+            'unit' => 'required|max:5|numeric',
+            'price_per_unit' => 'required|max:5|numeric',
         ]);
 
         if ($validator->fails()) {
