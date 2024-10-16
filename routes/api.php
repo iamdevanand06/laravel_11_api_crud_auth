@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\API\Auth\CodeCheckController;
 use App\Http\Controllers\API\Auth\ForgotPasswordController;
+use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\ProductController;
-use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
