@@ -43,7 +43,7 @@ class CodeCheckController extends Controller
                 return $this->sendError(['Passcode mis-match found'], ['user_condition' => 'rejected'], 422);
             }
 
-            if ($passwordReset->created_at > now()->addMinute(-10) != 1) {
+            if ($passwordReset->created_at > now()->addMinute(-10) != 0) {
                 return $this->sendError(['Passcode time out'], ['user_condition' => 'rejected'], 422);
             }
         } else {
@@ -51,12 +51,14 @@ class CodeCheckController extends Controller
         }
 
         if ($request->code_type == 'pv'){
-            ResetCodePassword::where('email', $request->email)->update(['verified' => '1']);
-            return $this->sendResponse(['user_condition' => 'approved'], trans('Your passcode is verified'));
+            $message = 'Your passcode is verified';
         }elseif($request->code_type == 'ev'){
             User::where('email', $request->email)->update(['email_verified_at' => now()]);
-            ResetCodePassword::where('email', $request->email)->delete();
-            return $this->sendResponse(['user_condition' => 'approved'], trans('Your Email is Verified'));
+            $message = 'Your Email is Verified';
         }
+
+        ResetCodePassword::where('email', $request->email)->update(['verified' => '1']);
+
+        return $this->sendResponse(['user_condition' => 'approved'], $message);
     }
 }

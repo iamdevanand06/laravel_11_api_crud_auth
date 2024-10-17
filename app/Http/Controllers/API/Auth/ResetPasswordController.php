@@ -25,11 +25,11 @@ class ResetPasswordController extends Controller
             return $this->sendError('Validation Error.', $validator->errors(), 422);
         }
 
-        $forgetPassword = ResetCodePassword::firstWhere('email', $request->email);
+        $forgetPassword = ResetCodePassword::where('email', $request->email)->where('code_type', 'pv')->first();
 
         if (isset($forgetPassword)) {
-            if ($forgetPassword->verified !== 1) {
-                return $this->sendError(['Passcode is already verified'], ['user_condition' => 'rejected'], 422);
+            if ($forgetPassword->password_changed == 1){
+                return $this->sendError(['Password is already changed'], ['user_condition' => 'rejected'], 422);
             }
         } else {
             return $this->sendError(['Passcode meta not retrieved'], ['user_condition' => 'rejected'], 422);
@@ -39,7 +39,7 @@ class ResetPasswordController extends Controller
 
         $user->update($request->only('password'));
 
-        ResetCodePassword::where('email', $request->email)->delete();
+        ResetCodePassword::where('email', $request->email)->where('code_type', 'pv')->update(['password_changed' => '1']);
 
         return $this->sendResponse(['redirect_url' => ''], 'The Password changed Successfully');
     }

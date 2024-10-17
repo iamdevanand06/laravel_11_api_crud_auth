@@ -14,6 +14,8 @@ class ResetCodePassword extends Model
         'email',
         'code',
         'code_type',
+        'sent_recipt',
+        'password_changed',
         'created_at',
     ];
 }

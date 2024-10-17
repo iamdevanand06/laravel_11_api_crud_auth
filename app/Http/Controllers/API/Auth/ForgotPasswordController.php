@@ -30,7 +30,7 @@ class ForgotPasswordController extends Controller
         $data['email'] = $request->email;
 
         // Delete all old code that user send before.
-        ResetCodePassword::where('email', $data['email'])->delete();
+        // ResetCodePassword::where('email', $data['email'])->delete();
 
         // Generate random code
         $data['code'] = mt_rand(100000, 999999);
@@ -38,17 +38,25 @@ class ForgotPasswordController extends Controller
         //send code type
         $data['code_type'] = $request->code_type;
 
-        // Create a new code
-        $codeData = ResetCodePassword::create($data);
+        $passwordReset = ResetCodePassword::where('email', $data['email'])->where('code_type', $data['code_type'])->first();
 
-        if ($request->code_type == 'pv') { //Password Reset
+        if (isset($passwordReset)) {
+            ResetCodePassword::where('email', $data['email'])->where('code_type', $data['code_type'])
+            ->update(['code' => $data['code'], 'sent_recipt' => '0', 'verified' => '0', 'password_changed' => '0']);
+        } else {
+
+            // Create a new code
+            $codeData = ResetCodePassword::create($data);
+        }
+
+        if ($data['code_type'] == 'pv') { //Password Reset
 
             $message = 'We have emailed your password reset passcode';
             $subject = 'Send Code Reset Password';
             $line_1 = 'We have received your request to reset your account password';
             $line_2 = 'You can use the following code to recover your account:';
 
-        } elseif($request->code_type == 'ev'){ //Email verification
+        } elseif($data['code_type'] == 'ev'){ //Email verification
 
             $message = 'We have emailed your email verification passcode';
             $subject = 'Send Code Verification Email';
@@ -62,7 +70,7 @@ class ForgotPasswordController extends Controller
             'body' => [
                 'line_1' => $line_1,
                 'line_2' => $line_2,
-                'code' => $codeData->code,
+                'code' => isset($codeData->code)?$codeData->code:$data['code'],
                 'line_3' => 'The allowed duration of the code is 10 minutes from the time the message was sent!'
             ]
         ];
@@ -73,12 +81,11 @@ class ForgotPasswordController extends Controller
 
             // Send email to user
             Mail::to($data['email'])->send(new SendCodeResetPassword($emailContent));
-
-            $data['sent_recipt'] = '1';
-
-            return $this->sendResponse(['userEmail' => $data['email'], 'message' => $message], 200);
-        } else {
-            return $this->sendResponse(['userEmail' => $data['email'], 'content' => $emailContent, 'message' => $message], 200);
+            $emailContent = [];
         }
+
+        ResetCodePassword::where('email', $data['email'])->where('code_type', $data['code_type'])->update(['sent_recipt' => '1']);
+
+        return $this->sendResponse(['userEmail' => $data['email'], 'content' => $emailContent, 'message' => $message], 200);
     }
 }
