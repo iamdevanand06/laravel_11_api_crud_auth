@@ -21,44 +21,48 @@ class CodeCheckController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $input = $request->all();
-        $validator = Validator::make($input, [
-            'email' => 'required|email|exists:users',
-            'code' => 'required|min:6|numeric',
-            'code_type' => 'required|string|max:2'
-        ]);
+        try {
+            $input = $request->all();
+            $validator = Validator::make($input, [
+                'email' => 'required|email|exists:users',
+                'code' => 'required|min:6|numeric',
+                'code_type' => 'required|string|max:2'
+            ]);
 
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error.', $validator->errors(), 422);
-        }
-
-        $passwordReset = ResetCodePassword::where('email', $request->email)->where('code_type', $request->code_type)->first();
-
-        if (isset($passwordReset)) {
-            if ($passwordReset->verified == 1) {
-                return $this->sendError(['Passcode is already verified'], ['user_condition' => 'rejected'], 422);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors(), 422);
             }
 
-            if (strcmp($passwordReset->code, $request->code) == '1') {
-                return $this->sendError(['Passcode mis-match found'], ['user_condition' => 'rejected'], 422);
+            $passwordReset = ResetCodePassword::where('email', $request->email)->where('code_type', $request->code_type)->first();
+
+            if (isset($passwordReset)) {
+                if ($passwordReset->verified == 1) {
+                    return $this->sendError(['Passcode is already verified'], ['user_condition' => 'rejected'], 422);
+                }
+
+                if (strcmp($passwordReset->code, $request->code) == '1') {
+                    return $this->sendError(['Passcode mis-match found'], ['user_condition' => 'rejected'], 422);
+                }
+
+                if ($passwordReset->created_at > now()->addMinute(-10) != 0) {
+                    return $this->sendError(['Passcode time out'], ['user_condition' => 'rejected'], 422);
+                }
+            } else {
+                return $this->sendError(['Passcode meta not retrieved'], ['user_condition' => 'rejected'], 422);
             }
 
-            if ($passwordReset->created_at > now()->addMinute(-10) != 0) {
-                return $this->sendError(['Passcode time out'], ['user_condition' => 'rejected'], 422);
+            if ($request->code_type == 'pv'){
+                $message = 'Your passcode is verified';
+            }elseif($request->code_type == 'ev'){
+                User::where('email', $request->email)->update(['email_verified_at' => now()]);
+                $message = 'Your Email is Verified';
             }
-        } else {
-            return $this->sendError(['Passcode meta not retrieved'], ['user_condition' => 'rejected'], 422);
+
+            ResetCodePassword::where('email', $request->email)->update(['verified' => '1']);
+
+            return $this->sendResponse(['user_condition' => 'approved'], $message);
+        } catch (Exception $e) {
+            Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
         }
-
-        if ($request->code_type == 'pv'){
-            $message = 'Your passcode is verified';
-        }elseif($request->code_type == 'ev'){
-            User::where('email', $request->email)->update(['email_verified_at' => now()]);
-            $message = 'Your Email is Verified';
-        }
-
-        ResetCodePassword::where('email', $request->email)->update(['verified' => '1']);
-
-        return $this->sendResponse(['user_condition' => 'approved'], $message);
     }
 }

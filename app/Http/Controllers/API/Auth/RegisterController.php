@@ -21,28 +21,32 @@ class RegisterController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
-            'c_password' => 'required|same:password',
-        ]);
+        try{
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'email' => 'required|email',
+                'password' => 'required',
+                'c_password' => 'required|same:password',
+            ]);
 
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error.', $validator->errors());
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $input = $request->all();
+            $input['password'] = bcrypt($input['password']);
+            $user = User::create($input);
+            $success['token'] = $user->createToken('MyApp')->accessToken;
+            $success['userDetails'] = [
+                'name' => $user->name,
+                'email' => $user->email,
+                'created_at' => $user->created_at,
+            ];
+
+            return $this->sendResponse($success, 'User register successfully.');
+        } catch (Exception $e) {
+            Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
         }
-
-        $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
-        $user = User::create($input);
-        $success['token'] = $user->createToken('MyApp')->accessToken;
-        $success['userDetails'] = [
-            'name' => $user->name,
-            'email' => $user->email,
-            'created_at' => $user->created_at,
-        ];
-
-        return $this->sendResponse($success, 'User register successfully.');
     }
 
     /**
