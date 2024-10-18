@@ -9,6 +9,7 @@ use App\Traits\commonTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Validator;
+use Storage;
 
 class ProductController extends Controller
 {
@@ -38,14 +39,21 @@ class ProductController extends Controller
         $validator = Validator::make($input, [
             'name' => 'required|unique:products|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
             'detail' => 'required|max:150|regex:/^[a-zA-Z0-9() ]+$/u',
+            'img_path' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'capasity_type' => 'required|max:3|alpha',
-            'capasity' => 'required|max:4|numeric',
-            'unit' => 'required|max:5|numeric',
-            'price_per_unit' => 'required|max:5|numeric',
+            'capasity' => 'required|max:1000|numeric',
+            'unit' => 'required|max:500|numeric',
+            'price_per_unit' => 'required|max:100000|numeric',
         ]);
 
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors(), 422);
+        }
+
+        if ($image = $request->file('img_path')) {
+            $productName = str_replace(' ', '_', $request->name) . '-' . date('Ymd_His') . "." . $image->getClientOriginalExtension();
+            Storage::disk('publicLocal')->putFileAs('products', $request->file('img_path'), $productName);
+            $input['img_path'] = env('APP_URL').'/assets/images/products/'.$productName;
         }
 
         $product = Product::create($input);
@@ -83,6 +91,7 @@ class ProductController extends Controller
         $validator = Validator::make($input, [
             'name' => 'required|unique:products|max:20|min:4|regex:/^[a-zA-Z ]+$/u',
             'detail' => 'required|max:150|regex:/^[a-zA-Z0-9() ]+$/u',
+            'img_path' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
             'capasity_type' => 'required|max:3|alpha',
             'capasity' => 'required|max:4|numeric',
             'unit' => 'required|max:5|numeric',
@@ -93,8 +102,20 @@ class ProductController extends Controller
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
+        if (($request->file('img_path'))) {
+            $productImage = $request->file('img_path');
+            $productName = date('YmdHis') . "." . $productImage->getClientOriginalExtension();
+            $request->image->move(public_path().'\assets\images', $productName);
+            $input['img_path'] = $productName;
+        }
+
         $product->name = $input['name'];
         $product->detail = $input['detail'];
+        $product->img_path = $input['img_path'];
+        $product->capasity_type = $input['capasity_type'];
+        $product->capasity = ['capasity'];
+        $product->unit = ['unit'];
+        $product->price_per_unit = ['price_per_unit'];
         $product->save();
 
         return $this->sendResponse(new ProductResource($product), 'Product updated successfully.');
