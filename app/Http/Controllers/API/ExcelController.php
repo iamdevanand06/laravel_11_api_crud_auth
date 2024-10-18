@@ -53,7 +53,7 @@ class ExcelController extends Controller
 
                 $writer->toBrowser();
 
-                return $this->sendResponse(new ProductResource($product), 'Download Product Excel successfully.');
+                return $this->sendResponse([], 'Download Product Excel successfully.');
             }
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
