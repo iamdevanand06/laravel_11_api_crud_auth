@@ -6,6 +6,7 @@ use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\ResetPasswordController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\ExcelController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,8 @@ Route::post('user/forgot-password/reset-password', ResetPasswordController::clas
 Route::middleware('auth:api')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('users', UserController::class);
+    Route::post('products-export', [ExcelController::class, 'downloadProduct']);
+    Route::post('users-export', [ExcelController::class, 'downloadUser']);
     Route::post('logout', [RegisterController::class, 'logout']);
 });
 
