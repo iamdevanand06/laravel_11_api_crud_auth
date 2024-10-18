@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use Storage;
+
 trait commonTrait
 {
     /**
@@ -37,5 +39,15 @@ trait commonTrait
         }
 
         return response()->json($response, $code);
+    }
+
+    public function fileExists($filePath){
+        if (Storage::exists($filePath)) {
+            $metaData = Storage::getMetaData($filePath);
+            if($metaData == false) {
+                return false;  // It is a directory, not a file
+            }
+            return true; // It is a file
+        }
     }
 }

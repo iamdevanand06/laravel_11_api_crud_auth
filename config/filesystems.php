@@ -53,6 +53,14 @@ return [
             'throw' => true,
         ],
 
+        'publicLocalUpload' => [
+            'driver' => 'local',
+            'root' => public_path('assets\uploadFile'),
+            // 'url' => env('APP_URL').'/public',
+            // 'visibility' => 'public',
+            'throw' => true,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -19,8 +19,10 @@ Route::post('user/forgot-password/reset-password', ResetPasswordController::clas
 Route::middleware('auth:api')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('users', UserController::class);
-    Route::post('products-export', [ExcelController::class, 'downloadProduct']);
-    Route::post('users-export', [ExcelController::class, 'downloadUser']);
+    Route::get('products-export', [ExcelController::class, 'downloadProduct']);
+    // Route::post('products-import', [ExcelController::class, 'uploadProduct']);
+    Route::post('users-import', [ExcelController::class, 'uploadUser']);
+    Route::get('users-export', [ExcelController::class, 'downloadUser']);
     Route::post('logout', [RegisterController::class, 'logout']);
 });
 
