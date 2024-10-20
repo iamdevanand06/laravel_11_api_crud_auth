@@ -63,6 +63,7 @@ class CodeCheckController extends Controller
             return $this->sendResponse(['user_condition' => 'approved'], $message);
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 }

@@ -26,6 +26,7 @@ class UserController extends Controller
             return $this->sendResponse(UserResource::collection($user)->response()->getData(), 'User retrieved successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 
@@ -59,6 +60,7 @@ class UserController extends Controller
             return $this->sendResponse(new UserResource($user), 'User created successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 
@@ -80,6 +82,7 @@ class UserController extends Controller
             return $this->sendResponse(new UserResource($user), 'User retrieved successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 
@@ -117,6 +120,7 @@ class UserController extends Controller
             return $this->sendResponse(new UserResource($user), 'User updated successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 
@@ -134,6 +138,7 @@ class UserController extends Controller
             return $this->sendResponse([], 'User deleted successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 }

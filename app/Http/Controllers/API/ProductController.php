@@ -27,6 +27,7 @@ class ProductController extends Controller
             return $this->sendResponse(ProductResource::collection($products)->response()->getData(), 'Products retrieved successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 
@@ -65,6 +66,7 @@ class ProductController extends Controller
             return $this->sendResponse(new ProductResource($product), 'Product created successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 
@@ -86,6 +88,7 @@ class ProductController extends Controller
             return $this->sendResponse(new ProductResource($product), 'Product retrieved successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 
@@ -133,6 +136,7 @@ class ProductController extends Controller
             return $this->sendResponse(new ProductResource($product), 'Product updated successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
     }
 
@@ -149,6 +153,7 @@ class ProductController extends Controller
             return $this->sendResponse([], 'Product deleted successfully.');
         } catch (Exception $e) {
             Log::error('Message => '.$e->getMessage().'Line No => '.$e->getLine());
+            return $this->sendError('Error', $e, 404);
         }
 
     }
