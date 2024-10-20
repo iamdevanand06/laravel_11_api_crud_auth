@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\File;
 use Storage;
 
 trait commonTrait
@@ -48,6 +49,19 @@ trait commonTrait
                 return false;  // It is a directory, not a file
             }
             return true; // It is a file
+        }
+    }
+
+    public function deleteExistFile($file_path){
+        if (File::exists($file_path)) {
+            File::delete($file_path);
+            if ($this->fileExists($file_path) == false){
+                Log::info('File successfully deleted: '.$filePath);
+                return true;
+            }
+        } else {
+            Log::warning('File could not be deleted: '.$filePath);
+            return false;
         }
     }
 }

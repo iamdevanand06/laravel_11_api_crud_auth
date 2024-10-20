@@ -12,7 +12,6 @@ use App\Models\Product;
 use App\Models\User;
 use Validator;
 use Storage;
-use File;
 
 class ExcelController extends Controller
 {
@@ -118,27 +117,29 @@ class ExcelController extends Controller
             if ($file = $request->file('upload_file')) {
                 $fileName =  'user-' . date('Ymd_His') . "." . $file->getClientOriginalExtension();
                 Storage::disk('publicLocalUpload')->putFileAs('tempFile', $request->file('upload_file'), $fileName);
-                $filePath = public_path('assets/uploadFile/tempFile/'.$fileName);
-            }
+                $filePath = public_path('assets\\uploadFile\\tempFile\\'.$fileName);
 
-            if ($this->fileExists($filePath) != 'false'){
-                $rows = SimpleExcelReader::create($filePath)
-                // ->useHeaders(['Name','Mobile Number','Email','Password','Locked','Status','Role ID'])
-                ->fromSheetName("Sheet1")->getRows()
-                ->each(function(array $userRow) {
-                    // dd($userRow['status']);
-                    User::create([
-                        'name' => isset($userRow['Name'])?$userRow['Name']:'-',
-                        'mobile_number' => isset($userRow['Mobile Number'])?$userRow['Mobile Number']:'-',
-                        'email' => isset($userRow['Email'])?$userRow['Email']:'-',
-                        'password' => isset($userRow['Password'])?$userRow['Password']:'-',
-                        'is_locked' => isset($userRow['Locked'])?$userRow['Locked']:'0',
-                        'status' => isset($userRow['Status'])?$userRow['Status']:'0',
-                        'role_id' => isset($userRow['RoleID'])?$userRow['RoleID']:'-',
-                    ]);
-                });
-                File::delete($filePath);
-                return $this->sendResponse([], 'Users Excel has Upload been successfully.');
+                if (isset($filePath) && $this->fileExists($filePath) != 'false'){
+                    $rows = SimpleExcelReader::create($filePath)
+                    // ->useHeaders(['Name','Mobile Number','Email','Password','Locked','Status','Role ID'])
+                    ->fromSheetName("Sheet1")->getRows()
+                    ->each(function(array $userRow) {
+                        User::create([
+                            'name' => isset($userRow['Name'])?$userRow['Name']:'-',
+                            'mobile_number' => isset($userRow['Mobile Number'])?$userRow['Mobile Number']:'-',
+                            'email' => isset($userRow['Email'])?$userRow['Email']:'-',
+                            'password' => isset($userRow['Password'])?$userRow['Password']:'-',
+                            'is_locked' => isset($userRow['Locked'])?$userRow['Locked']:'0',
+                            'status' => isset($userRow['Status'])?$userRow['Status']:'0',
+                            'role_id' => isset($userRow['RoleID'])?$userRow['RoleID']:'-',
+                        ]);
+                    });
+
+                    $this->deleteExistFile($filePath);
+                    return $this->sendResponse([],'Users Excel has Upload been successfully.');
+                }else{
+                    return $this->sendError('The File is absent',[], 404);
+                }
             }
 
         } catch (Exception $e) {
